@@ -19,7 +19,7 @@ app.use(helmet());
 async function redisCache (req, res, next) {
   const lastCacheUpdate = await redis.get("lastUpdate#"+req.url)
   const {headers, nextCacheDate} = getCacheDates()
-  if(lastCacheUpdate !== null && Number(lastCacheUpdate) > (nextCacheDate.getTime() - 10*3600e3)){
+  if(lastCacheUpdate !== null && Number(lastCacheUpdate) > (nextCacheDate.getTime() - 3600e3)){
     const cacheObject = await redis.get("data#"+req.url)
     res.set(headers)
       .status(200)
@@ -43,5 +43,18 @@ async function redisCache (req, res, next) {
 app.use(redisCache)
 
 app.use('/', [yieldRoutes, config, median, perp, enriched, lsd]);
+
+function errorHandler (err, req, res, next) {
+  console.log(err)
+  res.status(500)
+  res.render('error', { error: err })
+}
+
+app.use(errorHandler)
+
+process.on('uncaughtException', (err) => {
+  console.error('uncaughtException:', err.message);
+  process.exit(1);
+});
 
 module.exports = app;

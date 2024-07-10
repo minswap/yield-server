@@ -66,17 +66,6 @@ exports.getBlocksByTime = async (timestamps, chainString) => {
 };
 
 const getLatestBlockSubgraph = async (url) => {
-  // const queryGraph = gql`
-  //   {
-  //     indexingStatusForCurrentVersion(subgraphName: "<PLACEHOLDER>") {
-  //       chains {
-  //         latestBlock {
-  //           number
-  //         }
-  //       }
-  //     }
-  //   }
-  // `;
   const queryGraph = gql`
     {
       _meta {
@@ -87,19 +76,18 @@ const getLatestBlockSubgraph = async (url) => {
     }
   `;
 
-  // const blockGraph = await request(
-  //   'https://api.thegraph.com/index-node/graphql',
-  //   queryGraph.replace('<PLACEHOLDER>', url.split('name/')[1])
-  // );
   const blockGraph =
+    url.includes('https://gateway-arbitrum.network.thegraph.com/api') ||
     url.includes('metis-graph.maiadao.io') ||
     url.includes('babydoge/faas') ||
     url.includes('kybernetwork/kyberswap-elastic-cronos') ||
     url.includes('kybernetwork/kyberswap-elastic-matic') ||
+    url.includes('metisapi.0xgraph.xyz/subgraphs/name') ||
     url.includes(
       'https://subgraph.satsuma-prod.com/09c9cf3574cc/orbital-apes/v3-subgraph/api'
     ) ||
     url.includes('api.goldsky.com') ||
+    url.includes('api.studio.thegraph.com') ||
     url.includes('48211/uniswap-v3-base') ||
     url.includes('horizondex/block') ||
     url.includes('pancake-swap.workers.dev') ||
@@ -417,6 +405,7 @@ const makeMulticall = async (abi, addresses, chain, params = null) => {
       params,
     })),
     chain,
+    permitFailure: true,
   });
 
   const res = data.output.map(({ output }) => output);
